@@ -6,7 +6,7 @@ from skimage.color import (rgb2gray as rgb2gray_sk, rgb2lab, rgb2yuv, rgb2ycbcr,
 
 import numpy as np
 
-rgb2gray    = lambda input_image: rgb2gray_sk(input_image)[:, np.newaxis][:, [0,0,0]]
+rgb2gray    = lambda input_image: rgb2gray_sk(input_image)[:, :, :, np.newaxis][:, :, :, [0,0,0]]
 
 def _convert(input_, type_):
     return {
