@@ -1,9 +1,12 @@
 import torch
 import torch.cuda
 from torch.autograd import Variable
-from skimage.color import (rgb2lab, rgb2yuv, rgb2ycbcr, lab2rgb, yuv2rgb, ycbcr2rgb,
+from skimage.color import (rgb2gray as rgb2gray_sk, rgb2lab, rgb2yuv, rgb2ycbcr, lab2rgb, yuv2rgb, ycbcr2rgb,
                            rgb2hsv, hsv2rgb, rgb2xyz, xyz2rgb, rgb2hed, hed2rgb)
 
+import numpy as np
+
+rgb2gray    = lambda input_image: rgb2gray_sk(input_image)[:, np.newaxis][:, [0,0,0]]
 
 def _convert(input_, type_):
     return {
@@ -51,10 +54,11 @@ def _generic_transform_sk_3d(transform, in_type='', out_type=''):
         return torch.stack(to_stack)
     return apply_transform
 
-
+# --- Cie*LAB ---
+rgb_to_gray = _generic_transform_sk_4d(rgb2gray)
 # --- Cie*LAB ---
 rgb_to_lab = _generic_transform_sk_4d(rgb2lab)
-lab_to_rgb = _generic_transform_sk_3d(lab2rgb, in_type='double', out_type='float')
+lab_to_rgb = _generic_transform_sk_4d(lab2rgb, in_type='double', out_type='float')
 # --- YUV ---
 rgb_to_yuv = _generic_transform_sk_4d(rgb2yuv)
 yuv_to_rgb = _generic_transform_sk_4d(yuv2rgb)
@@ -62,14 +66,14 @@ yuv_to_rgb = _generic_transform_sk_4d(yuv2rgb)
 rgb_to_ycbcr = _generic_transform_sk_4d(rgb2ycbcr)
 ycbcr_to_rgb = _generic_transform_sk_4d(ycbcr2rgb, in_type='double', out_type='float')
 # --- HSV ---
-rgb_to_hsv = _generic_transform_sk_3d(rgb2hsv)
-hsv_to_rgb = _generic_transform_sk_3d(hsv2rgb)
+rgb_to_hsv = _generic_transform_sk_4d(rgb2hsv)
+hsv_to_rgb = _generic_transform_sk_4d(hsv2rgb)
 # --- XYZ ---
 rgb_to_xyz = _generic_transform_sk_4d(rgb2xyz)
-xyz_to_rgb = _generic_transform_sk_3d(xyz2rgb, in_type='double', out_type='float')
+xyz_to_rgb = _generic_transform_sk_4d(xyz2rgb, in_type='double', out_type='float')
 # --- HED ---
 rgb_to_hed = _generic_transform_sk_4d(rgb2hed)
-hed_to_rgb = _generic_transform_sk_3d(hed2rgb, in_type='double', out_type='float')
+hed_to_rgb = _generic_transform_sk_4d(hed2rgb, in_type='double', out_type='float')
 
 
 def err(type_):
@@ -78,6 +82,7 @@ def err(type_):
 
 def convert(input_, type_):
     return {
+        'rgb2gray': rgb_to_gray(input_),
         'rgb2lab': rgb_to_lab(input_),
         'lab2rgb': lab_to_rgb(input_),
         'rgb2yuv': rgb_to_yuv(input_),
