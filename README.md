@@ -2,13 +2,14 @@ PyTorch Colors
 ===========
 PyTorch Colors is a simple utility to **convert Tensors and Variables between color spaces**. Currently all the operations are non-differentiable.
 PyTorch Colors is in early alpha, and supports the following color spaces:
-1. RGB
-2. HSV
-3. CIE\*Lab
-4. YUV
-5. YCbCr
-6. XYZ
-7. HED
+1. GRAY
+2. RGB
+3. HSV
+4. CIE\*Lab
+5. YUV
+6. YCbCr
+7. XYZ
+8. HED
 
 Please request additional color spaces in the issues or provide a pull request with the implementation. Differentiable versions for each color space conversion will also be added in time.
 
