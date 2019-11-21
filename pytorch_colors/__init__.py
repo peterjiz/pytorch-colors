@@ -4,6 +4,10 @@ from torch.autograd import Variable
 from skimage.color import (rgb2gray as rgb2gray_sk, rgb2lab, rgb2yuv, rgb2ycbcr, lab2rgb, yuv2rgb, ycbcr2rgb,
                            rgb2hsv, hsv2rgb, rgb2xyz, xyz2rgb, rgb2hed, hed2rgb)
 
+import sys 
+sprintf = lambda format, *values : format % values
+printf  = lambda format, *values : sys.stdout.write(format % values)
+
 import numpy as np
 
 rgb2gray    = lambda input_image: rgb2gray_sk(input_image)[:, :, :, np.newaxis][:, :, :, [0,0,0]]
@@ -20,7 +24,7 @@ def _generic_transform_sk_4d(transform, in_type='', out_type=''):
         to_squeeze = (input_.dim() == 3)
         device = input_.device
         input_ = input_.cpu()
-        input_ = _convert(input_, in_type)
+        #input_ = _convert(input_, in_type)
 
         if to_squeeze:
             input_ = input_.unsqueeze(0)
@@ -30,7 +34,7 @@ def _generic_transform_sk_4d(transform, in_type='', out_type=''):
         output = torch.from_numpy(transformed).float().permute(0, 3, 1, 2)
         if to_squeeze:
             output = output.squeeze(0)
-        output = _convert(output, out_type)
+        #output = _convert(output, out_type)
         return output.to(device)
     return apply_transform
 
@@ -39,12 +43,12 @@ def _generic_transform_sk_3d(transform, in_type='', out_type=''):
     def apply_transform_individual(input_):
         device = input_.device
         input_ = input_.cpu()
-        input_ = _convert(input_, in_type)
+#         input_ = _convert(input_, in_type)
 
         input_ = input_.permute(1, 2, 0).numpy()
         transformed = transform(input_)
         output = torch.from_numpy(transformed).float().permute(2, 0, 1)
-        output = _convert(output, out_type)
+#         output = _convert(output, out_type)
         return output.to(device)
 
     def apply_transform(input_):
@@ -58,22 +62,23 @@ def _generic_transform_sk_3d(transform, in_type='', out_type=''):
 rgb_to_gray = _generic_transform_sk_4d(rgb2gray)
 # --- Cie*LAB ---
 rgb_to_lab = _generic_transform_sk_4d(rgb2lab)
-lab_to_rgb = _generic_transform_sk_4d(lab2rgb, in_type='double', out_type='float')
+lab_to_rgb = _generic_transform_sk_4d(lab2rgb)#, in_type='double', out_type='float')
+
 # --- YUV ---
 rgb_to_yuv = _generic_transform_sk_4d(rgb2yuv)
 yuv_to_rgb = _generic_transform_sk_4d(yuv2rgb)
 # --- YCbCr ---
 rgb_to_ycbcr = _generic_transform_sk_4d(rgb2ycbcr)
-ycbcr_to_rgb = _generic_transform_sk_4d(ycbcr2rgb, in_type='double', out_type='float')
+ycbcr_to_rgb = _generic_transform_sk_4d(ycbcr2rgb)#, in_type='double', out_type='float')
 # --- HSV ---
 rgb_to_hsv = _generic_transform_sk_4d(rgb2hsv)
 hsv_to_rgb = _generic_transform_sk_4d(hsv2rgb)
 # --- XYZ ---
 rgb_to_xyz = _generic_transform_sk_4d(rgb2xyz)
-xyz_to_rgb = _generic_transform_sk_4d(xyz2rgb, in_type='double', out_type='float')
+xyz_to_rgb = _generic_transform_sk_4d(xyz2rgb)#, in_type='double', out_type='float')
 # --- HED ---
 rgb_to_hed = _generic_transform_sk_4d(rgb2hed)
-hed_to_rgb = _generic_transform_sk_4d(hed2rgb, in_type='double', out_type='float')
+hed_to_rgb = _generic_transform_sk_4d(hed2rgb)# in_type='double', out_type='float')
 
 
 def err(type_):
